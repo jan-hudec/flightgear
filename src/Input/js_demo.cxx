@@ -51,7 +51,10 @@ int main ( int, char ** )
       printf ( "|           ~~~ Not Detected ~~~             " ) ;
     else
     {
-      printf ( "| Btns " ) ;
+      printf ( "| " ) ;
+      for ( j = 0; j < js[i]->getNumButtons() ; j++ )
+        printf ( "%1d", j % 10 ) ;
+      printf ( " " ) ;
 
       for ( j = 0 ; j < js[i]->getNumAxes () ; j++ )
         printf ( "Ax:%1d ", j ) ;
@@ -78,11 +81,14 @@ int main ( int, char ** )
         printf ( "|  .   .   .   .   .   .   .   .   .   .   . " ) ;
       else
       {
-        int b ;
+        std::vector<bool> b ;
 
         js[i]->read ( &b, ax[i] ) ;
 
-        printf ( "| %04x ", b ) ;
+        printf ( "| " ) ;
+        for ( j = 0 ; j < js[i]->getNumButtons () ; j++ )
+          printf ( b[j] ? "*" : "_" ) ;
+        printf ( " " ) ;
 
 	for ( j = 0 ; j < js[i]->getNumAxes () ; j++ )
 	  printf ( "%+.1f ", ax[i][j] ) ;

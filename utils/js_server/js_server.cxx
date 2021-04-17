@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 
     char packet[256] = "Hello world!";
     while (1) {
-        int b;
+        std::vector<bool> b;
         int len = 0;
         int axis = 0;
 
@@ -109,7 +109,12 @@ int main(int argc, char** argv)
             len += sizeof(axisvalue);
         }
 
-        int32_t b_l = b;
+        // limited to 32 buttons for backward compatibility
+        int32_t b_l = 0;
+        while (!b.empty()) {
+            b_l = (b_l << 1) + b.back();
+            b.pop_back();
+        }
         memcpy(packet + len, &b_l, sizeof(b_l));
         len += sizeof(b_l);
 

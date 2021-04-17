@@ -33,7 +33,7 @@ class jsInput {
     bool pretty_display;
     float axes[_JS_MAX_AXES];
     float axes_iv[MAX_JOYSTICKS][_JS_MAX_AXES];
-    int button_iv[MAX_JOYSTICKS];
+    std::vector<bool> button_iv[MAX_JOYSTICKS];
 
     int joystick,axis,button;
     bool axis_positive;

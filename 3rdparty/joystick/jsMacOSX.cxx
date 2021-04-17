@@ -456,13 +456,13 @@ void os_specific_s::addHatElement(jsJoystick* joy, CFDictionaryRef hat)
 	// (a joystick with 2 hats will use 16 buttons!)
 }
 
-void jsJoystick::rawRead(int *buttons, float *axes)
+void jsJoystick::rawRead(std::vector<bool> *buttons, float *axes)
 {
     if (!os)
         return;
 
     if (buttons)
-        *buttons = 0;
+        buttons->assign(num_buttons, false) ;
 
     if (os->removed) {
         setError();
@@ -480,7 +480,7 @@ void jsJoystick::rawRead(int *buttons, float *axes)
 	for (int b=0; b<num_buttons; ++b) {
 		(*(os->hidDev))->getElementValue(os->hidDev, os->buttonCookies[b], &hidEvent);
 		if (hidEvent.value && buttons)
-			*buttons |= 1 << b;
+			buttons->at(b) = true;
 	}
 
 	// real axes:

@@ -28,9 +28,9 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 
 #define _JS_MAX_AXES 16
-#define _JS_MAX_BUTTONS 32
 #define _JS_MAX_HATS 4
 
 #define JS_TRUE  1
@@ -84,8 +84,8 @@ public:
   void getMaxRange ( float *axes ) const { memcpy ( axes, max   , num_axes * sizeof(float) ) ; }
   void getCenter   ( float *axes ) const { memcpy ( axes, center, num_axes * sizeof(float) ) ; }
 
-  void read    ( int *buttons, float *axes ) ;
-  void rawRead ( int *buttons, float *axes ) ;
+  void read    ( std::vector<bool> *buttons, float *axes ) ;
+  void rawRead ( std::vector<bool> *buttons, float *axes ) ;
   // bool SetForceFeedBack ( int axe, float force );
 } ;
 

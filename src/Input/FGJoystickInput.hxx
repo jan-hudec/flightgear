@@ -54,7 +54,6 @@ public:
 
     static const int MAX_JOYSTICKS        = 16;
     static const int MAX_JOYSTICK_AXES    = _JS_MAX_AXES;
-    static const int MAX_JOYSTICK_BUTTONS = 32;
 
 private:
     /**

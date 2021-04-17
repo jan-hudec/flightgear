@@ -240,7 +240,7 @@ void jsJoystick::rawRead ( int *buttons, float *axes )
   if ( error )
   {
     if ( buttons )
-      *buttons = 0 ;
+      buttons->assign(num_buttons, false) ;
 
     if ( axes )
       for ( int i = 0 ; i < num_axes ; i++ )
@@ -258,7 +258,11 @@ void jsJoystick::rawRead ( int *buttons, float *axes )
   }
 
   if ( buttons != NULL )
-    *buttons = (int) os->js.dwButtons ;
+  {
+    buttons->resize(8 * sizeof(os->js.dwButtons)) ;
+    for (int i = 0; i < 8 * sizeof(os->js.dwButtons); ++i)
+      buttons->at(i) = ( ( (os->js.dwButtons >> i) & 1 ) != 0 ) ;
+  }
 
   if ( axes != NULL )
   {

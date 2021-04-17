@@ -211,9 +211,8 @@ void FGJoystickInput::postinit()
     JOYCAPS jsCaps ;
     joyGetDevCaps( i, &jsCaps, sizeof(jsCaps) );
     unsigned int nbuttons = jsCaps.wNumButtons;
-    if (nbuttons > MAX_JOYSTICK_BUTTONS) nbuttons = MAX_JOYSTICK_BUTTONS;
 #else
-    unsigned int nbuttons = MAX_JOYSTICK_BUTTONS;
+    unsigned int nbuttons = js->getNumButtons();
 #endif
 
     int naxes = js->getNumAxes();
@@ -350,7 +349,7 @@ void FGJoystickInput::updateJoystick(int index, FGJoystickInput::joystick* joy, 
 {
   float axis_values[MAX_JOYSTICK_AXES];
   int modifiers = fgGetKeyModifiers();
-  int buttons;
+  std::vector<bool> buttons;
   bool pressed, last_state;
   bool axes_initialized;
   float delay;
@@ -404,8 +403,8 @@ void FGJoystickInput::updateJoystick(int index, FGJoystickInput::joystick* joy, 
     }
   }
 
-  for (int j = 0; j < MAX_JOYSTICK_BUTTONS; j++) {
-    status->getChild("button", j, true)->setBoolValue((buttons & (1u << j)) > 0 );
+  for (int j = 0; j < js->getNumButtons(); j++) {
+    status->getChild("button", j, true)->setBoolValue( buttons[j] );
   }
 
   // Fire bindings for the axes.
@@ -445,7 +444,7 @@ void FGJoystickInput::updateJoystick(int index, FGJoystickInput::joystick* joy, 
   // Fire bindings for the buttons.
   for (int j = 0; j < joy->nbuttons; j++) {
     FGButton &b = joy->buttons[j];
-    pressed = (buttons & (1u << j)) > 0;
+    pressed = buttons[j];
     last_state = joy->buttons[j].last_state;
     delay = (pressed ? last_state ? b.interval_sec : b.delay_sec : b.release_delay_sec );
     if(pressed || last_state) b.last_dt += dt;

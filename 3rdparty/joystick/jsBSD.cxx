@@ -389,7 +389,7 @@ jsJoystick::jsJoystick ( int ident )
 }
 
 
-void jsJoystick::rawRead ( int *buttons, float *axes )
+void jsJoystick::rawRead ( std::vector<bool> *buttons, float *axes )
 {
   int len, usage, page, d;
   struct hid_item *h;
@@ -397,7 +397,7 @@ void jsJoystick::rawRead ( int *buttons, float *axes )
   if ( error )
   {
     if ( buttons )
-      *buttons = 0 ;
+      buttons->assign(getNumButtons(), false);
 
     if ( axes )
       for ( int i = 0 ; i < num_axes ; i++ )
@@ -415,7 +415,7 @@ void jsJoystick::rawRead ( int *buttons, float *axes )
       return ;
     }
     if ( buttons != NULL )
-      *buttons = ( os->ajs.b1 ? 1 : 0 ) | ( os->ajs.b2 ? 2 : 0 ) ;
+      buttons->assign({ os->ajs.b1, os->ajs.b2 });
 
     if ( axes != NULL )
     {

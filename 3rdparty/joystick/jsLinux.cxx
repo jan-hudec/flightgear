@@ -36,11 +36,11 @@
 #include <sys/ioctl.h>
 
 struct os_specific_s {
-  js_event     js          ;
-  int          tmp_buttons ;
-  float        tmp_axes [ _JS_MAX_AXES ] ;
-  char         fname [ 128 ] ;
-  int          fd ;
+  js_event          js          ;
+  std::vector<bool> tmp_buttons ;
+  float             tmp_axes [ _JS_MAX_AXES ] ;
+  char              fname [ 128 ] ;
+  int               fd ;
 };
 
 void jsInit () {}
@@ -51,8 +51,6 @@ void jsJoystick::open ()
 
   for ( int i = 0 ; i < _JS_MAX_AXES ; i++ )
     os->tmp_axes [ i ] = 0.0f ;
-
-  os->tmp_buttons = 0 ;
 
   os->fd = ::open ( os->fname, O_RDONLY ) ;
 
@@ -74,6 +72,7 @@ void jsJoystick::open ()
   num_axes = u ;
   ioctl ( os->fd, JSIOCGBUTTONS, &u ) ;
   num_buttons = u ;
+  os->tmp_buttons.assign(num_buttons, false) ;
   ioctl ( os->fd, JSIOCGNAME ( sizeof(name) ), name ) ;
   fcntl ( os->fd, F_SETFL      , O_NONBLOCK   ) ;
 
@@ -115,12 +114,12 @@ jsJoystick::jsJoystick ( int ident )
 }
 
 
-void jsJoystick::rawRead ( int *buttons, float *axes )
+void jsJoystick::rawRead ( std::vector<bool> *buttons, float *axes )
 {
   if ( error )
   {
     if ( buttons )
-      *buttons = 0 ;
+      buttons->assign(num_buttons, false);
 
     if ( axes )
       for ( int i = 0 ; i < num_axes ; i++ )
@@ -152,10 +151,7 @@ void jsJoystick::rawRead ( int *buttons, float *axes )
     switch ( os->js.type & ~JS_EVENT_INIT )
     {
       case JS_EVENT_BUTTON :
-        if ( os->js.value == 0 ) /* clear the flag */
-          os->tmp_buttons &= ~(1 << os->js.number) ;
-        else
-          os->tmp_buttons |=  (1 << os->js.number) ;
+        os->tmp_buttons [ os->js.number ] = (bool) os->js.value ;
         break ;
 
       case JS_EVENT_AXIS:

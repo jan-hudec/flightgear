@@ -52,7 +52,7 @@ jsJoystick::jsJoystick ( int ident )
 
 void jsJoystick::rawRead ( int *buttons, float *axes )
 {
-  if ( buttons != NULL ) *buttons = 0 ;
+  if ( buttons != NULL ) buttons->clear() ;
 }
 
 void jsInit ()  {}

@@ -20,6 +20,7 @@
 
 #include <simgear/compiler.h>
 
+#include <algorithm>
 #include <iostream>
 
 using std::cout;
@@ -44,14 +45,20 @@ int jsInput::getInput() {
     bool gotit=false;
 
     float delta;
-    int i, current_button = 0, button_bits = 0;
+    int i;
+    std::vector<bool> current_button, button_bits;
 
     joystick=axis=button=-1;
     axis_positive=false;
 
     if(pretty_display) {
         printf ( "+----------------------------------------------\n" ) ;
-        printf ( "| Btns " ) ;
+        printf ( "| " ) ;
+
+        for ( i = 0 ; i < jss->getJoystick()->getNumButtons() ; i++ )
+            printf ( "%1d", i % 10 ) ;
+
+        printf( " " ) ;
 
         for ( i = 0 ; i < jss->getJoystick()->getNumAxes() ; i++ )
             printf ( "Ax:%3d ", i ) ;
@@ -79,7 +86,13 @@ int jsInput::getInput() {
 
             jss->getJoystick()->read ( &current_button, axes ) ;
 
-            if(pretty_display) printf ( "| %04x ", current_button ) ;
+            if(pretty_display)
+            {
+                printf ( "| " ) ;
+                for ( i = 0 ; i < jss->getJoystick()->getNumButtons () ; i++ )
+                    printf ( current_button[i] ? "*" : "_" ) ;
+                printf ( " " ) ;
+            }
 
             for ( i = 0 ; i < jss->getJoystick()->getNumAxes(); i++ ) {
 
@@ -91,7 +104,9 @@ int jsInput::getInput() {
                         joystick=jss->getCurrentJoystickId();
                         axis=i;
                         axis_positive=(delta>0);
-                    } else if( current_button != 0 ) {
+                    } else if( *std::max_element( current_button.begin(), current_button.end() ) ) {
+                        // This logic is too simplistic. Some joysticks have switches that always
+                        // report some buttons pressed.
                         gotit=true;
                         joystick=jss->getCurrentJoystickId();
                         button_bits=current_button;
@@ -113,9 +128,9 @@ int jsInput::getInput() {
 
         SGTimeStamp::sleepForMSec(1);
     }
-    if(button_bits != 0) {
+    if( *std::max_element(button_bits.begin(), button_bits.end()) ) {
         for(int i=0;i<=31;i++) {
-            if( ( button_bits & (1 << i) ) > 0 ) {
+            if( button_bits[i] ) {
                 button=i;
                 break;
             }

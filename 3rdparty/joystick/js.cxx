@@ -63,12 +63,12 @@ float jsJoystick::fudge_axis ( float value, int axis ) const
 }
 
 
-void jsJoystick::read ( int *buttons, float *axes )
+void jsJoystick::read ( std::vector<bool> *buttons, float *axes )
 {
   if ( error )
   {
     if ( buttons )
-      *buttons = 0 ;
+      buttons->assign(getNumButtons(), false);
 
     if ( axes )
       for ( int i = 0 ; i < num_axes ; i++ )
